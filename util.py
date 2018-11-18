@@ -4,7 +4,7 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 import time
-
+global_id = 0
 
 
 def genshortTask(id):
@@ -77,8 +77,8 @@ class Cloudlet:
 		#print(len(neighbours))
 		self.Pgt = PolicyGradient(n_actions = TaskQueue_Size+1,
 					 n_features = TaskQueue_Size*2+2,
-					  learning_rate = 0.001,num_traj = num_of_traj,name='local'+str(self.id))
-		self.Pgt_route = PolicyGradient(n_actions = len(self.neighbours)+1,n_features = (TaskQueue_Size*2+2)*len(self.neighbours)+2, learning_rate = 0.001,num_traj = num_of_traj,name='route'+str(self.id))
+					  learning_rate = 0.001,name='local'+str(self.id))
+		self.Pgt_route = PolicyGradient(n_actions = len(self.neighbours)+1,n_features = (TaskQueue_Size*2+2)*len(self.neighbours)+2, learning_rate = 0.001,name='route'+str(self.id))
 
 		self.global_id = 0
 		self.iteration = 0
@@ -141,7 +141,7 @@ class Cloudlet:
 			return 0
 
 		
-		if(action > len(self.TaskQueue)):
+		if(action >= len(self.TaskQueue)):
 			action -= len(self.TaskQueue)
 			task = self.routedTasks[action]
 			if  task.memory_demand > self.resource_pool[1]:
@@ -169,7 +169,8 @@ class Cloudlet:
 
 
 		##print(len(self.TaskQueue))
-		for task in range(min(len(self.TaskQueue)+len(self.routedTasks),self.TaskQueue_Size)):
+		for k in range(min(len(self.TaskQueue),self.TaskQueue_Size)):
+			task = self.TaskQueue[k]
 			observation.append(task.execution_Time)
 			#observation.append(task.cpu_demand)
 			observation.append(task.memory_demand)
@@ -177,18 +178,19 @@ class Cloudlet:
 
 		#print("------")
 		size = len(self.TaskQueue)
+		size_routed = len(self.routedTasks)
 
 
 		#print(size)
-		for i in range(max(self.TaskQueue_Size - size,0)):
+		for i in range(min(size_routed,self.TaskQueue_Size-size)):
 			task = self.routedTasks[i]
 			observation.append(task.execution_Time)
 			observation.append(task.memory_demand)
 
-		for i in range(max(self.TaskQueue_Size- size - len(self.routedTasks),0)):
+		for i in range(max(self.TaskQueue_Size- size - size_routed,0)):
 			for j in range(2):
-			observation.append(0.0)
-		left_num = max(len(TaskQueue)-TaskQueue_Size,0)
+				observation.append(0.0)
+		left_num = max(len(self.TaskQueue)+len(self.routedTasks)-self.TaskQueue_Size,0)
 		#observation.append(self.resource_pool[0])
 		observation.append(self.resource_pool[1])
 		observation.append(min(left_num,15)/15.0)
@@ -198,24 +200,27 @@ class Cloudlet:
 		return self.rwlist
 
 	def train(self):
-		for num in len(self.obs_local):
-			for i in len(self.obs_local[num]):
-				self.Pgt_local.store_transition(self.obs_local[num][i],self.acts_local[num][i],self.rws_local[num][i])
-			self.Pgt_local.learn()
-			for j in len(self.obs_route[num]):
-				self.Pgt_route.store_transition(self.obs_route[num][i],self.acts_route[num][i],self.rws_route[num][i])
+		for num in range(len(self.obs_local)):
+			#print(num)
+			for i in range(len(self.obs_local[num])):
+				self.Pgt.store_transition(self.obs_local[num][i],self.acts_local[num][i],self.rws_local[num][i])
+			self.Pgt.learn()
+			for j in range(len(self.obs_route[num])):
+				self.Pgt_route.store_transition(self.obs_route[num][j],self.acts_route[num][j],self.rws_route[num][j])
 			self.Pgt_route.learn()
 	#def run_onestep(self,id_traj):
-	
+
 	def run_onestep(self,id_traj):
-		if id_traj > len(self.obs_local):
+		if id_traj >= len(self.obs_local):
 			self.obs_local.append(list())
-			self.rw_local.append(list())
+			self.rws_local.append(list())
 			self.acts_local.append(list())
 			self.obs_route.append(list())
 			self.acts_route.append(list())
+			self.rws_route.append(list())
+
 		self.progress()
-		tasklist = self.genTask(2)
+		tasklist = genTask(2)
 		for task in tasklist:
 			self.TaskQueue.append(task)
 		### find the tasks execute locally 
@@ -225,10 +230,10 @@ class Cloudlet:
 			result = self.execution(action) 
 			if not result:
 				action = 0
-			reward,count = self.rewardsignal()
-			if count == 0:
-				count = 1
-			self.avgs.append(reward/count)
+			Sum,average = self.rewardsignal()
+			#if count == 0:
+			#	count = 1
+			#self.avgs.append(reward/count)
 			#print(reward)
 			#for task in ExecutionList:
 			#	print (task.execution_Time)
@@ -237,6 +242,8 @@ class Cloudlet:
 			if(reward < 0):
 				reward = reward*10
 
+			#print(id_traj)
+			#print(len(self.obs_local))
 			self.obs_local[id_traj].append(observation)
 			self.acts_local[id_traj].append(action)
 			self.rws_local[id_traj].append(reward)
@@ -255,9 +262,9 @@ class Cloudlet:
 		for task in (self.routedTasks):
 			task_obs = list()
 			task_obs.append(task.execution_Time)
-			task_obs.append(task.cpu_demand)
+			#task_obs.append(task.cpu_demand)
 			task_obs.append(task.memory_demand) 
-			task_obs.append(task.response_time)
+			#task_obs.append(task.response_time)
 			task_obs = np.array(task_obs)
 			total_obs = np.concatenate((nb_obs,task_obs),axis=0)
 			action = self.Pgt_route.choose_action(total_obs)
@@ -278,7 +285,7 @@ class Cloudlet:
 
 			reward = reward / count
 			self.obs_route[id_traj].append(total_obs)
-			self.acts_local[id_traj].append(action)
+			self.acts_route[id_traj].append(action)
 			self.rws_route[id_traj].append(reward)
 			#self.Pgt_route.store_transition(total_obs,action,reward)
 
@@ -288,9 +295,9 @@ class Cloudlet:
 		for task in (self.TaskQueue):
 			task_obs = list()
 			task_obs.append(task.execution_Time)
-			task_obs.append(task.cpu_demand)
+			#task_obs.append(task.cpu_demand)
 			task_obs.append(task.memory_demand) 
-			task_obs.append(task.response_time)
+			#task_obs.append(task.response_time)
 			task_obs = np.array(task_obs)
 			total_obs = np.concatenate((nb_obs,task_obs),axis=0)
 			action = self.Pgt_route.choose_action(total_obs)
@@ -309,7 +316,7 @@ class Cloudlet:
 
 			reward = reward / count
 			self.obs_route[id_traj].append(total_obs)
-			self.acts_local[id_traj].append(action)
+			self.acts_route[id_traj].append(action)
 			self.rws_route[id_traj].append(reward)
 			#self.Pgt_route.store_transition(total_obs,action,reward)
 			#self.iteration += 1

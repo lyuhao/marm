@@ -18,8 +18,7 @@ class PolicyGradient:
 		name,
 		learning_rate = 0.001,
 		reward_decay = 0.99,
-		output_graph = False,
-		num_traj = 50.0
+		output_graph = False
 		):
 		self.n_actions = n_actions
 		self.n_features = n_features
@@ -29,7 +28,6 @@ class PolicyGradient:
 		self.reward_hist = []
 		self.cost_hist = []
 		self.name = name
-		self.num_traj = num_traj
 		self.Vs  = dict() ## a book keeping structure for keeping track of baseline term 
 
 	## build net
