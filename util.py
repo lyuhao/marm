@@ -23,6 +23,7 @@ def genTask(l):
 	global global_id
 	#s = int(np.random.poisson(l,1))
 	s = 0
+	TaskQueue = list()
 	for i in range(l):
 		s += np.random.choice([0,1])
 	#print(s)
@@ -34,6 +35,7 @@ def genTask(l):
 		#if(len(TaskQueue) < TaskQueue_Size):
 		TaskQueue.append(task)
 		global_id +=1
+	return TaskQueue
 
 class Task:
 	def __init__(self,
@@ -135,10 +137,20 @@ class Cloudlet:
 			return total_response,count
 
 	def execution(self,action):
-		if(action >= min(len(self.TaskQueue),self.TaskQueue_Size)):
+		if(action >= min(len(self.TaskQueue)+len(self.routedTasks),self.TaskQueue_Size)):
 			return 0
 
-	
+		
+		if(action > len(self.TaskQueue)):
+			action -= len(self.TaskQueue)
+			task = self.routedTasks[action]
+			if  task.memory_demand > self.resource_pool[1]:
+				return 0 
+			self.routedTasks.remove(task)
+			self.resource_pool[0] -= task.cpu_demand
+			self.resource_pool[1] -= task.memory_demand
+			self.ExecutionList.append(task)
+			return 1
 		task = self.TaskQueue[action]
 		if  task.memory_demand > self.resource_pool[1]:
 			return 0 
@@ -157,7 +169,7 @@ class Cloudlet:
 
 
 		##print(len(self.TaskQueue))
-		for task in range(min(len(self.TaskQueue),self.TaskQueue_Size)):
+		for task in range(min(len(self.TaskQueue)+len(self.routedTasks),self.TaskQueue_Size)):
 			observation.append(task.execution_Time)
 			#observation.append(task.cpu_demand)
 			observation.append(task.memory_demand)
@@ -166,8 +178,14 @@ class Cloudlet:
 		#print("------")
 		size = len(self.TaskQueue)
 
+
 		#print(size)
 		for i in range(max(self.TaskQueue_Size - size,0)):
+			task = self.routedTasks[i]
+			observation.append(task.execution_Time)
+			observation.append(task.memory_demand)
+
+		for i in range(max(self.TaskQueue_Size- size - len(self.routedTasks),0)):
 			for j in range(2):
 			observation.append(0.0)
 		left_num = max(len(TaskQueue)-TaskQueue_Size,0)
@@ -197,7 +215,9 @@ class Cloudlet:
 			self.obs_route.append(list())
 			self.acts_route.append(list())
 		self.progress()
-		self.genTask(2)
+		tasklist = self.genTask(2)
+		for task in tasklist:
+			self.TaskQueue.append(task)
 		### find the tasks execute locally 
 		while(True):
 			observation = self.getlocalobs()
@@ -263,6 +283,8 @@ class Cloudlet:
 			#self.Pgt_route.store_transition(total_obs,action,reward)
 
 
+
+		###only route task
 		for task in (self.TaskQueue):
 			task_obs = list()
 			task_obs.append(task.execution_Time)

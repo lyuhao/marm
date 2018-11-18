@@ -56,7 +56,7 @@ for i in range(number_of_cloudlet):
 
 for i in range(max_iter):
 	for cloudlet in cloudlet_list:
-		cloudlet.run(i)
+		cloudlet.run_onestep(i)
 
 
 rw0 = cloudlet_list[0].get()
