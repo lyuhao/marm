@@ -206,7 +206,7 @@ class Cloudlet:
 				self.Pgt_route.store_transition(self.obs_route[num][i],self.acts_route[num][i],self.rws_route[num][i])
 			self.Pgt_route.learn()
 	#def run_onestep(self,id_traj):
-
+	
 	def run_onestep(self,id_traj):
 		if id_traj > len(self.obs_local):
 			self.obs_local.append(list())

@@ -49,18 +49,24 @@ for i in range(number_of_cloudlet):
 	cloudlet_list.append(Cloudlet(config[0],config[1],config[2],neighbours[i],id=i))
 
 
-max_iter = 12000
+max_iter = 100
 for i in range(number_of_cloudlet):
 	cloudlet_list[i].init_neighbours(cloudlet_list)
 
-
-for i in range(max_iter):
+training_iter = 100
+num_of_traj = 2
+for j in range(training_iter):
+	for traj in num_of_traj:
+		np.random.seed(10)
+		for i in range(max_iter):
+			for cloudlet in cloudlet_list:
+				cloudlet.run_onestep(num_of_traj)
 	for cloudlet in cloudlet_list:
-		cloudlet.run_onestep(i)
+		cloudlet.train()
 
 
-rw0 = cloudlet_list[0].get()
-rw1 = cloudlet_list[1].get()
-plt.plot(rw0,color='red')
-plt.plot(rw1,color='blue')
-plt.show()
+#rw0 = cloudlet_list[0].get()
+#rw1 = cloudlet_list[1].get()
+#plt.plot(rw0,color='red')
+#plt.plot(rw1,color='blue')
+#plt.show()
