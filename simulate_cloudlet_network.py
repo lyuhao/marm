@@ -53,18 +53,31 @@ max_iter = 100
 for i in range(number_of_cloudlet):
 	cloudlet_list[i].init_neighbours(cloudlet_list)
 
-training_iter = 10
+training_iter = 500
 num_of_traj = 2
 for j in range(training_iter):
-	print(j)
+	#print("iter "+str(j))
 	for traj in range(num_of_traj):
 		np.random.seed(10)
+		#print("traj "+str(traj))
 		for i in range(max_iter):
 			for cloudlet in cloudlet_list:
 				cloudlet.run_onestep(traj)
+		for cloudlet in cloudlet_list:
+			cloudlet.reset()
 	for cloudlet in cloudlet_list:
 		cloudlet.train()
 
+## eval 
+	np.random.seed(1)
+	for i in range(200):
+		for cloudlet in cloudlet_list:
+			cloudlet.run_onestep(0)
+	for cloudlet in cloudlet_list:
+		cloudlet.reset()
+	rw0,rw0_ = cloudlet_list[0].get_rw()
+	rw1,rw1_ = cloudlet_list[1].get_rw()
+	print(j,sum(rw0)/len(rw0),sum(rw0_)/len(rw0_),sum(rw1)/len(rw1),sum(rw1_)/len(rw1_))	
 
 #rw0 = cloudlet_list[0].get()
 #rw1 = cloudlet_list[1].get()

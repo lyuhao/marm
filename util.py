@@ -57,9 +57,11 @@ class Task:
 
 class Cloudlet:
 	def __init__(self,cpu_capacity,mem_capacity,TaskQueue_Size,neighbours,id):
+		self.cpu_capacity = cpu_capacity
+		self.mem_capacity = mem_capacity
 		self.resource_pool = np.zeros(2)
-		self.resource_pool[0] = cpu_capacity
-		self.resource_pool[1] = mem_capacity
+		self.resource_pool[0] = self.cpu_capacity
+		self.resource_pool[1] = self.mem_capacity
 		self.TaskQueue_Size =TaskQueue_Size
 		self.TaskQueue = list()
 		self.routedTasks = list()
@@ -196,10 +198,11 @@ class Cloudlet:
 		observation.append(min(left_num,15)/15.0)
 		return np.array(observation)
 
-	def get(self):
-		return self.rwlist
+	def get_rw(self):
+		return self.rws_local[0],self.rws_route[0]
 
 	def train(self):
+		#print("train")
 		for num in range(len(self.obs_local)):
 			#print(num)
 			for i in range(len(self.obs_local[num])):
@@ -208,9 +211,32 @@ class Cloudlet:
 			for j in range(len(self.obs_route[num])):
 				self.Pgt_route.store_transition(self.obs_route[num][j],self.acts_route[num][j],self.rws_route[num][j])
 			self.Pgt_route.learn()
+
+		self.obs_local = []
+		self.acts_local = []
+		self.rws_local = []
+		self.obs_route = []
+		self.acts_route = []
+		self.rws_route = []
 	#def run_onestep(self,id_traj):
+	def reset(self):
+		self.resource_pool[0] = self.cpu_capacity
+		self.resource_pool[1] = self.mem_capacity
+	##	self.TaskQueue_Size =TaskQueue_Size
+		self.TaskQueue = list()
+		self.routedTasks = list()
+		self.ExecutionList = list()
+		self.rwlist = list()
+		self.avgs = list()
+		#self.obs_local = []
+		#self.acts_local = []
+		#self.rws_local = []
+		#self.obs_route = []
+		#self.acts_route = []
+		#self.rws_route = []
 
 	def run_onestep(self,id_traj):
+		#print(id_traj)
 		if id_traj >= len(self.obs_local):
 			self.obs_local.append(list())
 			self.rws_local.append(list())
