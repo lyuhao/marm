@@ -101,7 +101,7 @@ class Cloudlet:
 		for T in self.routedTasks:
 			Sum += T.response_time
 
-		return -Sum,count
+		return -Sum,1.0/count
 	def rewardsignal(self):
 		count = len(self.TaskQueue)
 		Sum = 0.0
@@ -340,7 +340,7 @@ class Cloudlet:
 				reward += r
 				count += c
 
-			reward = reward / count
+			reward = count
 			self.obs_route[id_traj].append(total_obs)
 			self.acts_route[id_traj].append(action)
 			self.rws_route[id_traj].append(reward)
