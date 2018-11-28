@@ -76,11 +76,11 @@ for j in range(training_iter):
 ## eval 
 	np.random.seed(1)
 	for i in range(200):
-		random.shuffle(cloudlet_list)
+		#random.shuffle(cloudlet_list)
 		for cloudlet in cloudlet_list:
 			cloudlet.run_onestep(0,True)
 	for i in range(50):
-		random.shuffle(cloudlet_list)
+		#random.shuffle(cloudlet_list)
 		for cloudlet in cloudlet_list:
 			cloudlet.run_onestep(0,False)
 	for cloudlet in cloudlet_list:

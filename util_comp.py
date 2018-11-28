@@ -22,6 +22,7 @@ def genTask(l):
     global global_id
     #s = int(np.random.poisson(l,1))
     s = 0
+    l = l / 3
     TaskQueue = list()
     for i in range(3):
         if np.random.uniform() < l:

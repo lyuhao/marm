@@ -23,6 +23,7 @@ def genTask(l,cloudlet):
     global global_id
     #s = int(np.random.poisson(l,1))
     s = 0
+    l = l / 3
     TaskQueue = list()
     for i in range(3):
         if np.random.uniform() < l:
@@ -302,7 +303,7 @@ class Cloudlet:
             #for task in ExecutionList:
             #   print (task.execution_Time)
             #print(action)
-            reward = 1.0/max(average,1.0) - 1.0/(6.0*self.load*10)
+            reward = 1.0/max(average,1.0) - 1.0/(4.0*self.load*10)
             if(reward < 0):
                 reward = reward * 10
 
