@@ -25,7 +25,7 @@ num_of_traj = 10
 global_id = 0
 Pgt = PolicyGradient(n_actions = TaskQueue_Size+1,
 					 n_features = TaskQueue_Size*2+2,
-					 learning_rate = 0.001,num_traj = num_of_traj,name="cloudlet")
+					 learning_rate = 0.001,name="cloudlet")
 
 DQN = DeepQNetwork(n_actions = TaskQueue_Size+1, n_features = TaskQueue_Size*2+2,learning_rate = 1e-3)
 

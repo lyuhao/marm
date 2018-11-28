@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import time
 import sys
 import  optparse
-from util import Cloudlet
+from util_comp import Cloudlet
 
 
 
@@ -49,43 +49,28 @@ for i in range(number_of_cloudlet):
 	cloudlet_list.append(Cloudlet(config[0],config[1],config[2],neighbours[i],id=i,load=config[3]))
 
 
-max_iter = 100
 for i in range(number_of_cloudlet):
 	cloudlet_list[i].init_neighbours(cloudlet_list)
 
-training_iter = 500
-num_of_traj = 5
-for j in range(training_iter):
-	#print("iter "+str(j))
-	for traj in range(num_of_traj):
-		np.random.seed(2)
-		#print("traj "+str(traj))
-		for i in range(max_iter):
-			flag = True
-			#random.shuffle(cloudlet_list)
-			for cloudlet in cloudlet_list:
-				flag_temp = cloudlet.run_onestep(traj)
-				flag = flag and flag_temp
-			if not flag:
-				break
-		for cloudlet in cloudlet_list:
-			cloudlet.reset()
-	for cloudlet in cloudlet_list:
-		cloudlet.train()
 
 ## eval 
-	np.random.seed(1)
-	for i in range(200):
-		random.shuffle(cloudlet_list)
-		for cloudlet in cloudlet_list:
-			cloudlet.run_onestep(0)
+np.random.seed(1)
+for i in range(200):
+	random.shuffle(cloudlet_list)
 	for cloudlet in cloudlet_list:
-		cloudlet.reset()
-	rw0,rw0_,rsp0 = cloudlet_list[0].get_rw()
-	rw1,rw1_,rsp1 = cloudlet_list[1].get_rw()
-	rsp = rsp0+rsp1
-	#print(rsp0,rsp1)
-	print(j,sum(rw0)/len(rw0),sum(rw0_)/max(len(rw0_),1),sum(rw1)/len(rw1),sum(rw1_)/max(len(rw1_),1),sum(rsp)*1.0/len(rsp))
+		cloudlet.run_onestepSJF()
+
+rsp0 = cloudlet_list[0].get_rw()
+rsp1 = cloudlet_list[1].get_rw()	
+for cloudlet in cloudlet_list:
+	cloudlet.reset()
+
+
+rsp = rsp0+rsp1
+#print(rsp0,rsp1)
+#print(rsp0)
+print(sum(rsp0)*1.0/len(rsp0),len(rsp0))
+print(sum(rsp1)*1.0/len(rsp1),len(rsp0))
 
 #rw0 = cloudlet_list[0].get()
 #rw1 = cloudlet_list[1].get()
