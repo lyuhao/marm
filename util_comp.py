@@ -193,13 +193,14 @@ class Cloudlet:
         
 
 ####################################################
-    def run_onestepSJF(self):
+    def run_onestepSJF(self,ifgen):
 
 
         self.progress()
-        tasklist = genTask(self.load)
-        for task in tasklist:
-            self.TaskQueue.append(task)
+        if ifgen:
+            tasklist = genTask(self.load)
+            for task in tasklist:
+                self.TaskQueue.append(task)
                         
          
         #key1= self.TaskQueue.execution_Time

@@ -58,7 +58,11 @@ np.random.seed(1)
 for i in range(200):
 	random.shuffle(cloudlet_list)
 	for cloudlet in cloudlet_list:
-		cloudlet.run_onestepSJF()
+		cloudlet.run_onestepSJF(True)
+for i in range(50):
+	random.shuffle(cloudlet_list)
+	for cloudlet in cloudlet_list:
+		cloudlet.run_onestepSJF(False)
 
 rsp0 = cloudlet_list[0].get_rw()
 rsp1 = cloudlet_list[1].get_rw()	

@@ -272,7 +272,7 @@ class Cloudlet:
         #self.acts_route = []
         #self.rws_route = []
 
-    def run_onestep(self,id_traj):
+    def run_onestep(self,id_traj,ifgen):
         #print(id_traj)
         if id_traj >= len(self.obs_local):
             self.obs_local.append(list())
@@ -283,9 +283,10 @@ class Cloudlet:
             #self.rws_route.append(list())
 
         self.progress()
-        tasklist = genTask(self.load,self)
-        for task in tasklist:
-            self.TaskQueue.append(task)
+        if ifgen:
+        	tasklist = genTask(self.load,self)
+        	for task in tasklist:
+        		self.TaskQueue.append(task)
         ### find the tasks execute locally 
         while(True):
             observation = self.getlocalobs()
