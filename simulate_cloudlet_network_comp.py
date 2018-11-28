@@ -67,17 +67,18 @@ for i in range(200):
 	for cloudlet in cloudlet_list:
 		cloudlet.run_onestepFCFS(False)
 
-rsp0 = cloudlet_list[0].get_rw()
-rsp1 = cloudlet_list[1].get_rw()	
+rsp_list = list()
+
+for cloudlet in cloudlet_list:
+	rsp_list.append(cloudlet.get_rw())
+#rsp0 = cloudlet_list[0].get_rw()
+#rsp1 = cloudlet_list[1].get_rw()	
 for cloudlet in cloudlet_list:
 	cloudlet.reset()
 
 
-rsp = rsp0+rsp1
-#print(rsp0,rsp1)
-#print(rsp0)
-print(sum(rsp0)*1.0/max(len(rsp0),1),len(rsp0))
-print(sum(rsp1)*1.0/max(len(rsp1),1),len(rsp0))
+for index,rsp in list(enumerate(rsp_list)):
+	print("avg response time for cloudlet "+str(index)+" :" + str(float(sum(rsp))/max(len(rsp),0)))
 
 #rw0 = cloudlet_list[0].get()
 #rw1 = cloudlet_list[1].get()
