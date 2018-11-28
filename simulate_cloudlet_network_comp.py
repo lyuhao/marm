@@ -46,7 +46,7 @@ cloudlet_list = list()
 
 for i in range(number_of_cloudlet):
 	config = configs[i]
-	cloudlet_list.append(Cloudlet(config[0],config[1],config[2],neighbours[i],id=i,load=config[3]))
+	cloudlet_list.append(Cloudlet(1.0,1.0,config[0],neighbours[i],id=i,load=config[1]))
 
 
 for i in range(number_of_cloudlet):
@@ -61,11 +61,11 @@ for i in range(200):
 	cloudlet_list = cloudlet_list[1:]
 	cloudlet_list.append(cloudlet_temp)
 	for cloudlet in cloudlet_list:
-		cloudlet.run_onestepFCFS(True)
+		cloudlet.run_onestepSJF(True)
 for i in range(200):
 	#random.shuffle(cloudlet_list)
 	for cloudlet in cloudlet_list:
-		cloudlet.run_onestepFCFS(False)
+		cloudlet.run_onestepSJF(False)
 
 rsp_list = list()
 
@@ -76,7 +76,7 @@ for cloudlet in cloudlet_list:
 for cloudlet in cloudlet_list:
 	cloudlet.reset()
 
-
+print("End simulation")
 for index,rsp in list(enumerate(rsp_list)):
 	print("avg response time for cloudlet "+str(index)+" :" + str(float(sum(rsp))/max(len(rsp),0)))
 

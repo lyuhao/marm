@@ -46,7 +46,7 @@ cloudlet_list = list()
 
 for i in range(number_of_cloudlet):
 	config = configs[i]
-	cloudlet_list.append(Cloudlet(config[0],config[1],config[2],neighbours[i],id=i,load=config[3]))
+	cloudlet_list.append(Cloudlet(1.0,1.0,config[0],neighbours[i],id=i,load=config[1]))
 
 
 max_iter = 100

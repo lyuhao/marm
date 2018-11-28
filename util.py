@@ -23,7 +23,6 @@ def genTask(l,cloudlet):
     global global_id
     #s = int(np.random.poisson(l,1))
     s = 0
-    l = l / 3
     TaskQueue = list()
     for i in range(3):
         if np.random.uniform() < l:
@@ -303,7 +302,7 @@ class Cloudlet:
             #for task in ExecutionList:
             #   print (task.execution_Time)
             #print(action)
-            reward = 1.0/max(average,1.0) - 1.0/(4.0*self.load*10)
+            reward = 1.0/max(average,1.0) - 1.0/(6.0*self.load*10)
             if(reward < 0):
                 reward = reward * 10
 
@@ -357,24 +356,24 @@ class Cloudlet:
 
 
         ###only route task
-        # for task in (self.TaskQueue):
-        #     task_obs = list()
-        #     task_obs.append(task.execution_Time)
-        #     #task_obs.append(task.cpu_demand)
-        #     task_obs.append(task.memory_demand) 
-        #     #task_obs.append(task.response_time)
-        #     task_obs = np.array(task_obs)
-        #     total_obs = np.concatenate((nb_obs,task_obs),axis=0)
-        #     action = self.Pgt_route.choose_action(total_obs)
+        for task in (self.TaskQueue):
+            task_obs = list()
+            task_obs.append(task.execution_Time)
+            #task_obs.append(task.cpu_demand)
+            task_obs.append(task.memory_demand) 
+            #task_obs.append(task.response_time)
+            task_obs = np.array(task_obs)
+            total_obs = np.concatenate((nb_obs,task_obs),axis=0)
+            action = self.Pgt_route.choose_action(total_obs)
 
-        #     if(action == 0):
-        #         continue
-        #     neighbour = self.neighbours[action-1]
-        #     neighbour.acceptTask(task)
-        #     self.TaskQueue.remove(task)
-        #     reward = 0
-        #     count = 0
-        #     self.pending_task[task.id] = (total_obs,action)
+            if(action == 0):
+                continue
+            neighbour = self.neighbours[action-1]
+            neighbour.acceptTask(task)
+            self.TaskQueue.remove(task)
+            reward = 0
+            count = 0
+            self.pending_task[task.id] = (total_obs,action)
 
 
 
