@@ -22,7 +22,6 @@ def genTask(l):
     global global_id
     #s = int(np.random.poisson(l,1))
     s = 0
-    l = l / 3
     TaskQueue = list()
     for i in range(3):
         if np.random.uniform() < l:
@@ -225,21 +224,21 @@ class Cloudlet:
             
                         
         #### find the tasks to route
-        # self.TaskQueue.sort(key=lambda x:x.execution_Time)
-        # for task in (self.TaskQueue):
+        self.TaskQueue.sort(key=lambda x:x.execution_Time)
+        for task in (self.TaskQueue):
                  
-        #     flag = False
-        #    # print(self.neighbours)
-        #    # print("hhhhh")
-        #     random.shuffle(self.neighbours)
-        #     for neighbour in self.neighbours:
-        #         flag = neighbour.acceptTask(task)
-        #         if(flag):
-        #             break
-        #     #flag = neighbour.acceptTask(task)
-        #     if not flag:
-        #         continue
-        #     self.TaskQueue.remove(task)
+            flag = False
+           # print(self.neighbours)
+           # print("hhhhh")
+            random.shuffle(self.neighbours)
+            for neighbour in self.neighbours:
+                flag = neighbour.acceptTask(task)
+                if(flag):
+                    break
+            #flag = neighbour.acceptTask(task)
+            if not flag:
+                continue
+            self.TaskQueue.remove(task)
             #self.obs_route[id_traj].append(total_obs)
             #self.acts_route[id_traj].append(action)
              #   action -=1
@@ -256,27 +255,27 @@ class Cloudlet:
         return a
 ##################################################################
 ##################################################################
-    def run_onestepFCFS(self):
+    def run_onestepFCFS(self,ifgen):
 
         self.progress()
-        tasklist = genTask(2)
-        for task in tasklist:
-            self.TaskQueue.append(task)
+        if ifgen:
+            tasklist = genTask(self.load)
+            for task in tasklist:
+                self.TaskQueue.append(task)
                         
-         
+        #print(self.TaskQueue) 
         #key1= self.TaskQueue.execution_Time
                 
         #self.TaskQueue.sort(key=lambda x: x.execution_Time)
                 
-                
+        q = self.routedTasks+self.TaskQueue           
         action = 0
         ### find the tasks execute locally 
         while(True):
             #observation = self.getlocalobs()
-            result = self.execution(action)
+            result = self.execution(q,action)
                         #if not result:
-                            #action = 0
-                        
+                            #action = 0               
             #self.obs_local[id_traj].append(observation)
             #self.acts_local[id_traj].append(action)
             if(result == 0):
@@ -284,20 +283,17 @@ class Cloudlet:
             
                         
         #### find the tasks to route
-        #
-        # for task in (self.TaskQueue):
-
-                 
-        #     flag = False
-        #     random.shuffle(self.neighbours)
-        #     for neighbour in self.neighbours:
-        #         flag = neighbour.acceptTask(task)
-        #         if(flag):
-        #             break
-        #     #flag = neighbour.acceptTask(task)
-        #     if not flag:
-        #         continue
-        #     self.TaskQueue.remove(task)
+            for task in self.TaskQueue[::-1]:
+                flag = False
+                random.shuffle(self.neighbours)
+                for neighbour in self.neighbours:
+                    flag = neighbour.acceptTask(task)
+                    if(flag):
+                        break
+             #flag = neighbour.acceptTask(task)
+                if not flag:
+                    continue
+                self.TaskQueue.remove(task)
             #self.obs_route[id_traj].append(total_obs)
             #self.acts_route[id_traj].append(action)
              #   action -=1

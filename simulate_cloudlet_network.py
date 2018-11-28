@@ -89,7 +89,7 @@ for j in range(training_iter):
 	rw1,rw1_,rsp1 = cloudlet_list[1].get_rw()
 	rsp = rsp0+rsp1
 	#print(rsp0,rsp1)
-	print(j,sum(rw0)/len(rw0),sum(rw0_)/max(len(rw0_),1),sum(rw1)/len(rw1),sum(rw1_)/max(len(rw1_),1),sum(rsp)*1.0/max(len(rsp),1))
+	print(j,sum(rw0)/len(rw0),sum(rw0_)/max(len(rw0_),1),sum(rw1)/len(rw1),sum(rw1_)/max(len(rw1_),1),sum(rsp0)*1.0/max(len(rsp0),1),sum(rsp1)*1.0/max(len(rsp1),1))
 
 #rw0 = cloudlet_list[0].get()
 #rw1 = cloudlet_list[1].get()

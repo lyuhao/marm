@@ -56,13 +56,16 @@ for i in range(number_of_cloudlet):
 ## eval 
 np.random.seed(1)
 for i in range(200):
-	random.shuffle(cloudlet_list)
+	#random.shuffle(cloudlet_list)
+	cloudlet_temp = cloudlet_list[0]
+	cloudlet_list = cloudlet_list[1:]
+	cloudlet_list.append(cloudlet_temp)
 	for cloudlet in cloudlet_list:
-		cloudlet.run_onestepSJF(True)
-for i in range(50):
-	random.shuffle(cloudlet_list)
+		cloudlet.run_onestepFCFS(True)
+for i in range(200):
+	#random.shuffle(cloudlet_list)
 	for cloudlet in cloudlet_list:
-		cloudlet.run_onestepSJF(False)
+		cloudlet.run_onestepFCFS(False)
 
 rsp0 = cloudlet_list[0].get_rw()
 rsp1 = cloudlet_list[1].get_rw()	
@@ -73,8 +76,8 @@ for cloudlet in cloudlet_list:
 rsp = rsp0+rsp1
 #print(rsp0,rsp1)
 #print(rsp0)
-print(sum(rsp0)*1.0/len(rsp0),len(rsp0))
-print(sum(rsp1)*1.0/len(rsp1),len(rsp0))
+print(sum(rsp0)*1.0/max(len(rsp0),1),len(rsp0))
+print(sum(rsp1)*1.0/max(len(rsp1),1),len(rsp0))
 
 #rw0 = cloudlet_list[0].get()
 #rw1 = cloudlet_list[1].get()
