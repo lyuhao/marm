@@ -207,7 +207,7 @@ class Cloudlet:
         q = self.TaskQueue+self.routedTasks    
         #self.TaskQueue.sort(key=lambda x: x.response_time,reverse=True)
         #self.routedTasks.sort(key=lambda x: x.response_time,reverse=True)
-        q.sort(key=lambda x:x.response_time,reverse=True)
+        q.sort(key=lambda x:x.execution_Time,reverse=False)
         action = 0
         ### find the tasks execute locally 
         while(True):
