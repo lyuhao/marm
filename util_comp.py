@@ -224,7 +224,7 @@ class Cloudlet:
             
                         
         #### find the tasks to route
-        self.TaskQueue.sort(key=lambda x:x.execution_Time)
+        self.TaskQueue.sort(key=lambda x:(-x.response_time,x.execution_Time))
         for task in (self.TaskQueue):
                  
             flag = False
