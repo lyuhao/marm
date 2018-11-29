@@ -53,25 +53,25 @@ max_iter = 100
 for i in range(number_of_cloudlet):
 	cloudlet_list[i].init_neighbours(cloudlet_list)
 
-training_iter = 500
+training_iter = 1000
 num_of_traj = 5
 for j in range(training_iter):
 	#print("iter "+str(j))
-	for traj in range(num_of_traj):
-		np.random.seed(2)
-		#print("traj "+str(traj))
-		for i in range(max_iter):
-			flag = True
-			#random.shuffle(cloudlet_list)
-			for cloudlet in cloudlet_list:
-				flag_temp = cloudlet.run_onestep(traj,True)
-				flag = flag and flag_temp
-			if not flag:
-				break
-		for cloudlet in cloudlet_list:
-			cloudlet.reset()
-	for cloudlet in cloudlet_list:
-		cloudlet.train()
+	# for traj in range(num_of_traj):
+	# 	np.random.seed(7)
+	# 	#print("traj "+str(traj))
+	# 	for i in range(max_iter):
+	# 		flag = True
+	# 		#random.shuffle(cloudlet_list)
+	# 		for cloudlet in cloudlet_list:
+	# 			flag_temp = cloudlet.run_onestep(traj,True)
+	# 			flag = flag and flag_temp
+	# 		if not flag:
+	# 			break
+	# 	for cloudlet in cloudlet_list:
+	# 		cloudlet.reset()
+	# for cloudlet in cloudlet_list:
+	# 	cloudlet.train()
 
 ## eval 
 	np.random.seed(1)
@@ -79,17 +79,20 @@ for j in range(training_iter):
 		#random.shuffle(cloudlet_list)
 		for cloudlet in cloudlet_list:
 			cloudlet.run_onestep(0,True)
-	for i in range(50):
+	for i in range(200):
 		#random.shuffle(cloudlet_list)
 		for cloudlet in cloudlet_list:
 			cloudlet.run_onestep(0,False)
-	for cloudlet in cloudlet_list:
-		cloudlet.reset()
+
 	rw0,rw0_,rsp0 = cloudlet_list[0].get_rw()
 	rw1,rw1_,rsp1 = cloudlet_list[1].get_rw()
+
+	for cloudlet in cloudlet_list:
+		cloudlet.reset()
 	rsp = rsp0+rsp1
+
 	#print(rsp0,rsp1)
-	print(j,sum(rw0)/len(rw0),sum(rw0_)/max(len(rw0_),1),sum(rw1)/len(rw1),sum(rw1_)/max(len(rw1_),1),sum(rsp0)*1.0/max(len(rsp0),1),sum(rsp1)*1.0/max(len(rsp1),1))
+	print(j,sum(rw0)/max(len(rw0),1),sum(rw0_)/max(len(rw0_),1),sum(rw1)/max(len(rw1),1),sum(rw1_)/max(len(rw1_),1),sum(rsp0)*1.0/max(len(rsp0),1),len(rsp0),sum(rsp1)*1.0/max(len(rsp1),1),len(rsp1))
 
 #rw0 = cloudlet_list[0].get()
 #rw1 = cloudlet_list[1].get()

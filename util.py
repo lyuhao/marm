@@ -24,6 +24,7 @@ def genTask(l,cloudlet):
     #s = int(np.random.poisson(l,1))
     s = 0
     TaskQueue = list()
+    #print(l)
     for i in range(3):
         if np.random.uniform() < l:
             s += 1
@@ -103,7 +104,8 @@ class Cloudlet:
         task_id = task.id
         tu = self.pending_task.pop(task_id)
         response_time = task.response_time*1.0
-        reward = 1 / response_time
+       #print(response_time)
+        reward = 1 / response_time  - 1.0/(4.0*self.load*10)
         self.obs_route.append(tu[0])
         self.acts_route.append(tu[1])
         self.rws_route.append(reward)
@@ -181,7 +183,8 @@ class Cloudlet:
         return 1
 
 
-
+    def isaccept(self):
+        return self.routedTasks < TaskQueue
     def getlocalobs(self):
         observation = list()
 
@@ -218,9 +221,15 @@ class Cloudlet:
 
         for key in self.pending_task.keys():
             tu = self.pending_task.pop(key)
-            self.rws_route.append(-1)
+            self.rws_route.append(- 1.0/(4.0*self.load*10))
         #print(len(self.rws_local[0]),len(self.rws_route))
         a,b,c = self.rws_local[0],self.rws_route,self.resp
+        #print(len(self.TaskQueue))
+        #print(len(self.routedTasks))
+        for et in self.TaskQueue:
+            self.resp.append(et.response_time)
+        for et in self.routedTasks:
+            self.resp.append(et.response_time)
         self.obs_local = []
         self.acts_local = []
         self.rws_local = []
@@ -256,6 +265,7 @@ class Cloudlet:
         self.resource_pool[0] = self.cpu_capacity
         self.resource_pool[1] = self.mem_capacity
     ##  self.TaskQueue_Size =TaskQueue_Size
+        #print(len(self.TaskQueue))
         self.TaskQueue = list()
         self.routedTasks = list()
         self.ExecutionList = list()
@@ -273,15 +283,13 @@ class Cloudlet:
         #self.rws_route = []
 
     def run_onestep(self,id_traj,ifgen):
-        #print(id_traj)
+
         if id_traj >= len(self.obs_local):
             self.obs_local.append(list())
             self.rws_local.append(list())
             self.acts_local.append(list())
-            #self.obs_route.append(list())
-            #self.acts_route.append(list())
-            #self.rws_route.append(list())
 
+        #print(len(self.TaskQueue))
         self.progress()
         if ifgen:
         	tasklist = genTask(self.load,self)
@@ -295,25 +303,18 @@ class Cloudlet:
             if not result:
                 action = 0
             Sum,average = self.rewardsignal()
-            #if count == 0:
-            #   count = 1
-            #self.avgs.append(reward/count)
-            #print(reward)
-            #for task in ExecutionList:
-            #   print (task.execution_Time)
-            #print(action)
-            reward = 1.0/max(average,1.0) - 1.0/(6.0*self.load*10)
+
+            reward = 1.0/max(average,1.0) - 1.0/(4.0*self.load*10)
             if(reward < 0):
                 reward = reward * 10
 
-            #print(id_traj)
-            #print(len(self.obs_local))
+
             self.obs_local[id_traj].append(observation)
             self.acts_local[id_traj].append(action)
             self.rws_local[id_traj].append(reward)
             if(result == 0):
                 break
-            #self.Pgt.store_transition(observation,action,reward/count)
+
 
         #### find the tasks to route
         nb_obs = np.array([])
@@ -323,39 +324,15 @@ class Cloudlet:
             nb_obs = np.concatenate((nb_obs,observation),axis=0)
 
 
-        # for task in (self.routedTasks):
-        #   task_obs = list()
-        #   task_obs.append(task.execution_Time)
-        #   #task_obs.append(task.cpu_demand)
-        #   task_obs.append(task.memory_demand) 
-        #   #task_obs.append(task.response_time)
-        #   task_obs = np.array(task_obs)
-        #   total_obs = np.concatenate((nb_obs,task_obs),axis=0)
-        #   action = self.Pgt_route.choose_action(total_obs)
-
-        #   if(action == 0):
-        #       continue
-        #   neighbour = self.neighbours[action-1]
-        #   flag = neighbour.acceptTask(task)
-        #   if not flag:
-        #       continue
-        #   self.routedTasks.remove(task)
-        #   reward = 0
-        #   count = 0
-        #   for neighbour in self.neighbours:
-        #       r,c = neighbour.remoutereward()
-        #       reward += r
-        #       count += c
-
-        #   reward = reward / count
-        #   self.obs_route[id_traj].append(total_obs)
-        #   self.acts_route[id_traj].append(action)
-        #   self.rws_route[id_traj].append(reward)
-            #self.Pgt_route.store_transition(total_obs,action,reward)
 
 
 
         ###only route task
+
+        neis = []
+        for neighbour in self.neighbours:
+            if(neighbour.isaccept):
+                neis.append(neighbour)
         for task in (self.TaskQueue):
             task_obs = list()
             task_obs.append(task.execution_Time)
@@ -369,43 +346,13 @@ class Cloudlet:
             if(action == 0):
                 continue
             neighbour = self.neighbours[action-1]
-            neighbour.acceptTask(task)
-            self.TaskQueue.remove(task)
-            reward = 0
-            count = 0
-            self.pending_task[task.id] = (total_obs,action)
+            flag = neighbour.acceptTask(task)
+            if(flag):
+                self.TaskQueue.remove(task)
+                reward = 0
+                count = 0
+                self.pending_task[task.id] = (total_obs,action)
 
-
-
-
-        #   for neighbour in self.neighbours:
-        #       r,c = neighbour.remoutereward()
-        #   #   reward += r
-        #       count += c
-
-            #reward = count
-            #self.obs_route[id_traj].append(total_obs)
-            #self.acts_route[id_traj].append(action)
-            #self.rws_route[id_traj].append(reward)
-            #self.Pgt_route.store_transition(total_obs,action,reward)
-            #self.iteration += 1
-            #if(self.iteration%30 == 0):
-            #   self.Pgt_route.learn()
-
-            #self.time += 1
-            #print(self.time)
-        # if((ite+1) % 30 == 0):
-        #   self.Pgt.learn()
-        #   self.rwlist.append(sum(self.avgs)/len(self.avgs))
-        #   self.avgs = []
-            #print(reward)
-            #print("time: "+str(time))
-            #start = time.time()
-            #print(sum(avgs)/len(avgs))
-            #vt = Pgt.learn()
-            #print(string)
-                #print(str((times+1)/30)+" "+str(vt))
-                #print(time.time() - start)
 
         return self.TaskQueue_Size < 15
         #plt.plot(rw)
