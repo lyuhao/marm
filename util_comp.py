@@ -114,7 +114,7 @@ class Cloudlet:
                 total_response+=et.response_time
                 self.resp.append(et.response_time)
                 count+=1
-            return total_response,count
+        return total_response,count
 
     def execution(self,q,action):
         if(action >= min(len(self.TaskQueue)+len(self.routedTasks),self.TaskQueue_Size)):
