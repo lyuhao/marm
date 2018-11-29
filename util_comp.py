@@ -23,7 +23,7 @@ def genTask(l):
     #s = int(np.random.poisson(l,1))
     s = 0
     TaskQueue = list()
-    for i in range(3):
+    for i in range(15):
         if np.random.uniform() < l:
             s += 1
     #print(s)
