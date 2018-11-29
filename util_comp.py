@@ -23,7 +23,7 @@ def genTask(l):
     #s = int(np.random.poisson(l,1))
     s = 0
     TaskQueue = list()
-    for i in range(15):
+    for i in range(10):
         if np.random.uniform() < l:
             s += 1
     #print(s)
@@ -207,7 +207,7 @@ class Cloudlet:
         q = self.TaskQueue+self.routedTasks    
         #self.TaskQueue.sort(key=lambda x: x.response_time,reverse=True)
         #self.routedTasks.sort(key=lambda x: x.response_time,reverse=True)
-        q.sort(key=lambda x:x.execution_Time,reverse=False)
+        q.sort(key=lambda x:(x.execution_Time))    
         action = 0
         ### find the tasks execute locally 
         while(True):
@@ -224,7 +224,7 @@ class Cloudlet:
             
                         
         #### find the tasks to route
-        self.TaskQueue.sort(key=lambda x:(-x.response_time,x.execution_Time))
+        self.TaskQueue.sort(key=lambda x:(x.execution_Time))
         for task in (self.TaskQueue):
                  
             flag = False
